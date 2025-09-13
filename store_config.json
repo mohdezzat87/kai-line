@@ -1,0 +1,16 @@
+﻿{
+    "store_name":  "Sign \u0026 Sign Trading",
+    "slug":  "kai-line",
+    "color":  "#5BA7D1",
+    "hero_image":  "hero_pro.jpg",
+    "categories":  [
+                       {
+                           "name":  "Women\u0027s Fashion",
+                           "image":  "fashion_category.png"
+                       },
+                       {
+                           "name":  "Women\u0027s Accessories",
+                           "image":  "accessories_category.png"
+                       }
+                   ]
+}

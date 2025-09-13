@@ -1,0 +1,367 @@
+/* Global styling for the eCommerce builder. */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background-color: #f8f5f2;
+  color: #333;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header .logo {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+}
+
+header nav a {
+  margin-left: 1.5rem;
+  font-size: 1rem;
+  color: #444;
+}
+
+header nav a:hover {
+  color: var(--primary-color);
+}
+
+main {
+  padding: 2rem 2rem 3rem;
+}
+
+/* Hero section */
+.hero {
+  width: 100%;
+  min-height: 350px;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom right, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 1;
+  font-size: 2.2rem;
+  color: #333;
+  text-align: center;
+}
+
+/* Categories grid */
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.category-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  text-align: center;
+}
+
+.category-card:hover {
+  transform: translateY(-3px);
+}
+
+.category-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.category-card h3 {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Product listing */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-card .info {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-card h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.product-card p.price {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.product-card form {
+  margin-top: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+/* On hover reduce opacity to create subtle effect */
+.btn:hover {
+  opacity: 0.85;
+}
+
+/* Product detail */
+.product-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.product-detail img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+}
+
+.product-detail .details {
+  flex: 1;
+}
+
+.product-detail h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+}
+
+.product-detail p.description {
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+
+.cart-table th,
+.cart-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cart-table th {
+  background-color: #f4f1ee;
+}
+
+.cart-total {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: right;
+}
+
+.checkout-form {
+  max-width: 500px;
+  margin-top: 2rem;
+}
+
+.checkout-form label {
+  display: block;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.checkout-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.alert {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #ffeeba;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+  color: #777;
+} /* overrides */
+ .hero{min-height:460px;background-size:cover;background-position:center;}
+ .hero h1{font-size:42px;line-height:1.25;}
+ .nav .brand img{height:128px;width:auto;}
+ /* === UI overrides (header) === */
+ .nav{align-items:center}
+ .nav > a:not(.brand){display:none !important;} /* hide store-name text link */
+ .nav .brand img{height:160px;width:auto;display:block}
+ /* === UI overrides (hero) === */
+ .hero{position:relative;min-height:520px;background-size:cover;background-position:center}
+ .hero h1{font-size:48px;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.25)}
+ .hero::before{
+   content:"";
+   position:absolute; left:36px; top:36px;
+   width:150px; height:150px;
+   background:url("images/logo.png") no-repeat center/contain;
+   opacity:.95; filter:drop-shadow(0 2px 6px rgba(0,0,0,.25));
+ }
+ /* === Sign & Sign: hero collage for materials (stickers, banners, printers) === */
+ .hero{
+   position:relative;
+   min-height:560px;
+   background-image:
+     url("images/sticker.jpg"),
+     url("images/banner.jpg"),
+     url("images/printer.jpg"),
+     url("images/hero_pro.jpg");
+   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+   background-size: 28% auto, 28% auto, 28% auto, cover;
+   background-position: 2% 95%, 36% 95%, 70% 95%, center;
+   padding-bottom: 240px; /* space for the collage row */
+ }
+ .hero::after{
+   content:"";
+   position:absolute; inset:0;
+   background: linear-gradient(180deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.12) 60%, rgba(255,255,255,0.35) 100%);
+   pointer-events:none;
+ }
+ .hero h1{ font-size:50px; line-height:1.2; text-shadow:0 2px 10px rgba(0,0,0,.25) }
+ /* === Revert hero to compact single-image banner === */
+ .hero{
+   position: relative;
+   min-height: 360px;              /* previous height */
+   background-image: url("images/hero_pro.jpg");
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   padding-bottom: 0;
+ }
+ .hero::after{ background: none; }
+ /* === Responsive hero banner (desktop ? mobile) === */
+ .hero{
+   position: relative;
+   /* Height scales with viewport: min 260px, typical ~32vw, max 460px */
+   min-height: clamp(260px, 32vw, 460px);
+   background-image: url("images/hero_pro.jpg");
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   border-radius: 10px;
+ }
+
+ /* Center & scale headline nicely on all screens */
+ .hero h1{
+   margin: 0;
+   padding: clamp(16px, 4vw, 40px);
+   text-align: center;
+   font-size: clamp(22px, 4.6vw, 46px);
+   line-height: 1.25;
+   text-shadow: 0 4px 14px rgba(0,0,0,.12);
+ }
+
+ /* Mobile: optionally use a tighter crop image */
+ @media (max-width: 640px){
+   .hero{
+     min-height: clamp(220px, 45vw, 320px);
+     background-image: url("images/hero_pro-mobile.jpg");
+   }
+ }
+ /* ===== View toolbar ===== */
+ .view-toolbar{
+   display:flex; gap:.5rem; align-items:center;
+   margin: 0 0 1rem 0; padding:.25rem .5rem;
+   background: #fff; border:1px solid #eee; border-radius:8px;
+   width:max-content
+ }
+ .view-toolbar .btn-small{
+   font-size:.9rem; padding:.25rem .6rem; border-radius:6px; border:1px solid #e5e5e5; background:#fafafa;
+   cursor:pointer
+ }
+ .view-toolbar .btn-small.active{ background:var(--primary-color,#d4a373); color:#fff; border-color:transparent }
+
+ /* ===== Products layouts ===== */
+ .products{ display:grid; gap:1rem }
+ .products.products--grid{ grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); }
+ .product-card{ background:#fff; border-radius:10px; box-shadow:0 1px 2px rgba(0,0,0,.05); overflow:hidden; border:1px solid #eee }
+ .product-card img{ width:100%; height:200px; object-fit:cover; display:block }
+ .product-card .info{ padding:.75rem }
+ .product-card .title{ font-weight:600; display:block; margin:0 0 .25rem 0 }
+ .product-card .price{ color:var(--primary-color,#d4a373); font-weight:700 }
+
+ /* Thumbnails (compact rows) */
+ .products.products--thumbs{ grid-template-columns: 1fr; }
+ .product-card.thumb{ display:grid; grid-template-columns:120px 1fr auto; align-items:center; gap:1rem; padding:.5rem }
+ .product-card.thumb img{ width:120px; height:90px; border-radius:8px }
+ .product-card.thumb .info{ padding:0 }
+ .product-card .btn{ margin:.5rem }
