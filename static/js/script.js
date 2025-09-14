@@ -1,324 +1,375 @@
-﻿/////////////////////////////
-// Simple cart + UI logic //
-/////////////////////////////
+﻿// ---- clean script.js (safe, single file) ----
+(function(){
+  const $ = (sel,root=document)=>root.querySelector(sel);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
-let storeConfig = { name: "Kai Line", color: "#d4a373", categories: ["Women's Fashion","Women's Accessories"] };
-let productsData = [];
+  // ------ CONFIG / CURRENCY ------
+  let CONFIG = null;
+  const money = (v)=>{
+    const sym = CONFIG?.currency_symbol || (CONFIG?.currency === "QAR" ? "QAR " : "QAR ");
+    return sym + Number(v||0).toFixed(2);
+  };
 
-// ----- cart helpers -----
-function loadCart(){ try{return JSON.parse(localStorage.getItem('cart')||'[]')}catch(e){return []} }
-function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); updateHeaderCount(); }
-function cartCount(){ return loadCart().reduce((s,i)=>s+i.qty,0); }
-function findProduct(id){ return productsData.find(p=>p.id===id); }
-function inCart(id){ return loadCart().some(i=>i.id===id); }
-function addOrRemove(id){
-  let cart = loadCart();
-  const idx = cart.findIndex(i=>i.id===id);
-  if(idx>=0){ cart.splice(idx,1); } else { cart.push({id, qty:1}); }
-  saveCart(cart); return !(idx>=0);
-}
-function setQty(id, qty){
-  let cart = loadCart();
-  const idx = cart.findIndex(i=>i.id===id);
-  if(idx<0) return;
-  if(qty<=0){ cart.splice(idx,1); } else { cart[idx].qty = qty; }
-  saveCart(cart);
-}
-function updateHeaderCount(){
-  const el = document.querySelector('#nav-cart-count');
-  if(el) el.textContent = `Cart (${cartCount()})`;
-}
-
-// -------- DATA LOADING (prefer JSON files over embedded globals) --------
-async function ensureData(){
-  try{
-    // Prefer external JSON (so changes in store_config.json take effect)
-    const rc = await fetch('store_config.json');
-    if(rc.ok) storeConfig = await rc.json();
-    else if(window.__STORE_CONFIG__) storeConfig = window.__STORE_CONFIG__;
-    else if(window.STORE_CONFIG)     storeConfig = window.STORE_CONFIG;
-  }catch(e){
-    if(window.__STORE_CONFIG__) storeConfig = window.__STORE_CONFIG__;
-    else if(window.STORE_CONFIG)     storeConfig = window.STORE_CONFIG;
+  async function loadConfig(){
+    if (CONFIG) return CONFIG;
+    try {
+      const url = "store_config.json?v=" + Date.now();
+      const res = await fetch(url, {cache:"no-store"});
+      CONFIG = await res.json();
+      window.__STORE_CONFIG__ = CONFIG;
+    } catch(e){ console.error("config load failed", e); CONFIG = {}; }
+    return CONFIG;
   }
-  document.documentElement.style.setProperty('--primary-color', storeConfig.color || '#5BA7D1');
 
-  try{
-    const rp = await fetch('products.json');
-    if(rp.ok) productsData = await rp.json();
-    else if(window.__PRODUCTS__)     productsData = window.__PRODUCTS__;
-    else if(window.PRODUCTS_DATA)    productsData = window.PRODUCTS_DATA;
-  }catch(e){
-    if(window.__PRODUCTS__)     productsData = window.__PRODUCTS__;
-    else if(window.PRODUCTS_DATA)    productsData = window.PRODUCTS_DATA;
+  // ------ PRODUCTS DATA ------
+  async function loadProducts(){
+    try {
+      const res = await fetch('./static/products.json?v=' + Date.now());
+      const list = await res.json();
+      window.__PRODUCTS__ = list;
+      return list;
+    } catch(e){
+      // fallback demo items
+      const list = [
+        {id:"dress", title:"Flowy Dress", price:120, image:"images/dress_placeholder.png", category:"Women’s Fashion"},
+        {id:"earrings", title:"Statement Earrings", price:35, image:"images/earrings_placeholder.png", category:"Women’s Accessories"},
+        {id:"bracelet", title:"Delicate Bracelet", price:150, image:"images/earrings_placeholder.png", category:"Women’s Accessories"}
+      ];
+      window.__PRODUCTS__ = list;
+      return list;
+    }
   }
-}
 
-// -------- RENDERERS --------
-function renderHeader(){
-  const header = document.getElementById('header');
-  if(!header) return;
-  const brandName = storeConfig.store_name || storeConfig.name || 'Store';
-  header.innerHTML = `
-    <div class="container">
-      <div class="nav">
-        <a href="index.html" class="brand" style="display:flex;align-items:center;gap:.5rem;">
-          <img src="images/logo.png" alt="logo" class="logo" style="height:160px;display:block" onerror="this.style.display='none'">
-          <span>${brandName}</span>
+  // ------ STORAGE HELPERS ------
+  const getCart = ()=>{ try{return JSON.parse(localStorage.getItem("cart")||"[]")}catch(e){return []} };
+  const setCart = (c)=>localStorage.setItem("cart", JSON.stringify(c));
+  const getOrders = ()=>{ try{return JSON.parse(localStorage.getItem("orders")||"[]")}catch(e){return []} };
+  const setOrders = (o)=>localStorage.setItem("orders", JSON.stringify(o));
+
+  // ------ HEADER / FOOTER ------
+  function renderHeader(){
+    const h = $("#header");
+    if (!h) return;
+    const count = getCart().reduce((s,i)=>s+Number(i.qty||1),0);
+    h.innerHTML = `
+      <div class="header container" style="padding:18px 0;">
+        <a href="index.html" class="brand" style="display:flex;gap:12px;align-items:center;">
+          <img src="images/logo.png" alt="logo" width="44" height="44"/>
+          <div style="font-weight:800;letter-spacing:.2px;">${CONFIG?.store_name||"Sign & Sign Trading"}</div>
         </a>
-        <nav>
+        <nav style="display:flex;gap:10px">
           <a href="index.html">Home</a>
           <a href="products.html">Shop</a>
-          <a id="nav-cart-count" href="cart.html">Cart (${cartCount()})</a>
+          <a href="orders.html" id="orders-link">My Orders</a>
+          <a href="cart.html">Cart (${count})</a>
         </nav>
       </div>
-    </div>`;
-}
-
-function renderHome(){
-  const main=document.getElementById('main'); if(!main) return;
-  const cats = storeConfig.categories?.map(c=>c.name||c) || ["Women's Fashion","Women's Accessories"];
-  const c0 = cats[0], c1 = cats[1];
-  const img0 = (storeConfig.categories?.[0]?.image)||'fashion_category.png';
-  const img1 = (storeConfig.categories?.[1]?.image)||'accessories_category.png';
-  const hero = storeConfig.hero_image || 'hero.png';
-  main.innerHTML = `
-    <div class="hero" style="background-image:url('images/${hero}')">
-      <h1>Large-format Printing & Signage<br>Precision • Speed • Quality</h1>
-    </div>
-    <h2 style="margin-top:2rem;">Categories</h2>
-    <div class="categories">
-      <a class="category-card" href="products.html?category=${encodeURIComponent(c0)}">
-        <img src="images/${img0}"><div class="label">${c0}</div>
-      </a>
-      <a class="category-card" href="products.html?category=${encodeURIComponent(c1)}">
-        <img src="images/${img1}"><div class="label">${c1}</div>
-      </a>
-    </div>`;
-}
-
-function renderProducts(){
-  const main=document.getElementById('main'); if(!main) return;
-  const selected = new URL(location.href).searchParams.get('category');
-  let list = [...productsData];
-  if(selected){ list = list.filter(p=>p.category===selected); }
-
-  const cats = (storeConfig.categories||[]).map(c=>c.name||c);
-  const catLinks = cats.map(c => `<a href="products.html?category=${encodeURIComponent(c)}">${c}</a>`).join(' ');
-
-  main.innerHTML = `
-    <div style="margin-bottom:1rem;"><strong>Filter by category:</strong>
-      <a href="products.html"${selected? '':' style="font-weight:bold;"'}>All</a>
-      ${catLinks}
-    </div>
-    <div class="products" id="products-grid"></div>`;
-
-  const grid = document.getElementById('products-grid');
-  grid.innerHTML = '';
-  if(list.length===0){ grid.innerHTML = '<p>No products found.</p>'; return; }
-
-  list.forEach(p=>{
-    const isIn = inCart(p.id);
-    const card = document.createElement('div');
-    card.className='product-card';
-    card.innerHTML = `
-      <img src="images/${p.image}" alt="${p.title}">
-      <div class="info">
-        <a class="title" href="product.html?id=${encodeURIComponent(p.id)}">${p.title}</a>
-        <div class="price">QAR ${Number(p.price).toFixed(2)}</div>
-      </div>
-      <button class="btn" data-id="${p.id}">${isIn? 'Remove':'Add to Cart'}</button>
     `;
-    card.querySelector('button').addEventListener('click', (e)=>{
-      const nowIn = addOrRemove(p.id);
-      e.currentTarget.textContent = nowIn? 'Remove':'Add to Cart';
-    });
-    grid.appendChild(card);
-  });
-}
+  }
+  function renderFooter(){
+    const f = $("#footer");
+    if (!f) return;
+    f.innerHTML = `<div class="container" style="padding:24px 0;color:#64748b;">© ${new Date().getFullYear()} ${CONFIG?.store_name||""}</div>`;
+  }
 
-function renderProductDetail(){
-  const main=document.getElementById('main'); if(!main) return;
-  const id = new URL(location.href).searchParams.get('id');
-  const p = findProduct(id); if(!p){ main.textContent='Product not found'; return; }
-  const isIn = inCart(p.id);
-  main.innerHTML = `
-    <div class="product-detail">
-      <div><img src="images/${p.image}" alt="${p.title}"></div>
-      <div class="details">
-        <h2>${p.title}</h2>
-        <p>${p.description}</p>
-        <p class="price" style="font-size:1.5rem; color:var(--primary-color);">QAR ${Number(p.price).toFixed(2)}</p>
-        <button id="toggle-cart" class="btn">${isIn? 'Remove from Cart':'Add to Cart'}</button>
-      </div>
-    </div>`;
-  document.getElementById('toggle-cart').addEventListener('click', (e)=>{
-    const nowIn = addOrRemove(p.id);
-    e.currentTarget.textContent = nowIn? 'Remove from Cart':'Add to Cart';
-  });
-}
-
-function renderCart(){
-  const main=document.getElementById('main'); if(!main) return;
-  const cart = loadCart();
-  if(cart.length===0){ main.innerHTML='<h1>Your Cart</h1><p>Your cart is empty.</p>'; return; }
-
-  let total = 0;
-  const rows = cart.map(item=>{
-    const p = findProduct(item.id); if(!p) return '';
-    const sub = Number(p.price) * item.qty; total += sub;
-    return `
-      <tr data-id="${p.id}">
-        <td>${p.title}</td>
-        <td>
-          <button class="qtybtn" data-d="-1">-</button>
-          <input class="qty" type="number" min="1" value="${item.qty}" style="width:60px; text-align:center;">
-          <button class="qtybtn" data-d="1">+</button>
-        </td>
-        <td>QAR ${Number(p.price).toFixed(2)}</td>
-        <td class="subtotal">QAR ${sub.toFixed(2)}</td>
-        <td><button class="btn btn-remove">Remove</button></td>
-      </tr>`;
-  }).join('');
-
-  main.innerHTML = `
-    <h1>Your Cart</h1>
-    <table class="cart-table">
-      <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th><th></th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="text-align:right; font-weight:bold; margin-top:1rem;">Total: QAR <span id="cart-total">${total.toFixed(2)}</span></div>
-    <a class="btn" href="checkout.html" style="margin-top:1rem; display:inline-block;">Proceed to Checkout</a>
-  `;
-
-  const tbody = main.querySelector('tbody');
-  tbody.addEventListener('click', (e)=>{
-    const tr = e.target.closest('tr'); if(!tr) return;
-    const id = tr.getAttribute('data-id');
-    if(e.target.classList.contains('btn-remove')){ setQty(id, 0); renderCart(); return; }
-    if(e.target.classList.contains('qtybtn')){
-      const delta = Number(e.target.getAttribute('data-d'));
-      const input = tr.querySelector('.qty');
-      const newQty = Math.max(0, Number(input.value) + delta);
-      input.value = newQty || 1; setQty(id, newQty); renderCart();
+  // ------ HOME ------
+  async function renderHome(){
+    const hero = $("#hero");
+    if (hero){
+      hero.innerHTML = `
+        <div class="container">
+          <div class="card" style="padding:26px">
+            <h1 style="margin:0 0 6px;font-size:40px;line-height:1.1;">Large-format Printing & Signage</h1>
+            <div style="color:#475569;font-size:18px;">Precision • Speed • Quality</div>
+          </div>
+        </div>`;
     }
-  });
-  tbody.addEventListener('change', (e)=>{
-    if(!e.target.classList.contains('qty')) return;
-    const tr = e.target.closest('tr'); const id = tr.getAttribute('data-id');
-    const q = Math.max(0, Number(e.target.value)||0); setQty(id, q); renderCart();
-  });
-}
-
-// -------- BOOT --------
-async function boot(){
-  await ensureData();
-  renderHeader();
-  updateHeaderCount();
-  const page = document.body.dataset.page;
-  if(page==='home') renderHome();
-  if(page==='products') renderProducts();
-  if(page==='product') renderProductDetail();
-  if(page==='cart') renderCart();
-  if(page==='checkout') renderCheckout();
-  }
-document.addEventListener('DOMContentLoaded', boot);
-
-
-
-
-
-
-/* === PATCH: view modes + checkout (safe) === */
-(function(){
-  function getViewMode(){ try{return localStorage.getItem("viewMode")||"grid";}catch(e){return "grid";} }
-  function setViewMode(m){ try{localStorage.setItem("viewMode",m);}catch(e){}; if (typeof renderProducts==="function"){ renderProducts(); } }
-  window.setViewMode = setViewMode; window.getViewMode = getViewMode;
-
-  if (typeof renderProducts === "function") {
-    const _orig = renderProducts;
-    window.renderProducts = function(){
-      _orig();
-      var main = document.getElementById("main"); if(!main) return;
-      var grid = main.querySelector(".products"); if(!grid) return;
-
-      var bar = document.createElement("div");
-      bar.className = "view-toolbar";
-      bar.innerHTML = '<span style="opacity:.75;margin-right:.25rem">View:</span>'
-        + '<button class="btn-small" data-view="grid">Grid</button>'
-        + '<button class="btn-small" data-view="thumbs">Thumbnails</button>';
-      main.insertBefore(bar, grid);
-
-      var mode = getViewMode();
-      if (mode === "thumbs") {
-        grid.classList.remove("products--grid");
-        grid.classList.add("products--thumbs");
-        grid.querySelectorAll(".product-card").forEach(function(c){ c.classList.add("thumb"); });
-      } else {
-        grid.classList.remove("products--thumbs");
-        grid.classList.add("products--grid");
-        grid.querySelectorAll(".product-card").forEach(function(c){ c.classList.remove("thumb"); });
-      }
-      bar.querySelectorAll("button").forEach(function(b){
-        if (b.getAttribute("data-view")===mode) b.classList.add("active");
-        b.addEventListener("click", function(){ setViewMode(b.getAttribute("data-view")); });
-      });
-    };
   }
 
-  function renderCheckout(){
-    var main=document.getElementById("main"); if(!main) return;
-    if (typeof loadCart!=="function" || typeof findProduct!=="function"){
-      main.innerHTML = "<h1>Checkout</h1><p>Cart not available.</p>"; return;
+  // ------ PRODUCTS GRID ------
+  async function renderProducts(){
+    const list = await loadProducts();
+    const host = $("#products-grid");
+    if (!host) return;
+    host.classList.add("grid");
+    host.innerHTML = list.map(p=>`
+      <article class="card">
+        <div class="thumb"><img src="${p.image||'images/dress_placeholder.png'}" alt=""></div>
+        <div style="padding:12px 14px;">
+          <div style="font-weight:700">${p.title}</div>
+          <div style="margin:.25rem 0 .6rem;color:#0f172a;font-weight:700">${money(p.price)}</div>
+          <button class="btn btn-sm" data-add="${p.id}">Add to Cart</button>
+        </div>
+      </article>
+    `).join("");
+
+    host.addEventListener("click",(e)=>{
+      const btn = e.target.closest("[data-add]");
+      if (!btn) return;
+      const id = btn.getAttribute("data-add");
+      const prod = (window.__PRODUCTS__||[]).find(x=>x.id===id);
+      if (!prod) return;
+      const cart = getCart();
+      const ex = cart.find(i=>i.id===id);
+      if (ex) ex.qty = Number(ex.qty||1)+1; else cart.push({id, qty:1});
+      setCart(cart);
+      renderHeader();
+    });
+  }
+
+  // ------ CART ------
+  async function renderCart(){
+    const host = $("#cart-table-body");
+    if (!host) return;
+    await loadProducts();
+    const cart = getCart();
+    const products = window.__PRODUCTS__||[];
+    const rows = cart.map(item=>{
+      const p = products.find(x=>x.id===item.id)||{};
+      const price = Number(p.price||0);
+      const qty = Number(item.qty||1);
+      return `
+        <tr>
+          <td>${p.title||item.id}</td>
+          <td><input type="number" min="1" value="${qty}" data-qty="${item.id}" style="width:72px"></td>
+          <td>${money(price)}</td>
+          <td style="font-weight:700">${money(price*qty)}</td>
+          <td><button class="btn btn-outline" data-remove="${item.id}">Remove</button></td>
+        </tr>`;
+    }).join("");
+    host.innerHTML = rows || `<tr><td colspan="5" style="text-align:center;color:#64748b">Your cart is empty.</td></tr>`;
+    updateCartTotal();
+
+    const table = $("#cart-table");
+    table.addEventListener("input",(e)=>{
+      const el = e.target.closest("input[data-qty]");
+      if (!el) return;
+      const id = el.getAttribute("data-qty");
+      const cart = getCart();
+      const row = cart.find(i=>i.id===id);
+      if (row){ row.qty = Math.max(1, Number(el.value||1)); setCart(cart); updateCartTotal(); }
+    });
+    table.addEventListener("click",(e)=>{
+      const rm = e.target.closest("[data-remove]");
+      if (!rm) return;
+      const id = rm.getAttribute("data-remove");
+      setCart(getCart().filter(i=>i.id!==id));
+      renderCart(); renderHeader();
+    });
+
+    const cta = $("#to-checkout");
+    if (cta) cta.onclick = ()=>location.href="checkout.html";
+  }
+  function updateCartTotal(){
+    const products = window.__PRODUCTS__||[];
+    const total = getCart().reduce((s,i)=>{
+      const p = products.find(x=>x.id===i.id)||{};
+      return s + Number(p.price||0)*Number(i.qty||1);
+    },0);
+    const el = $("#cart-total");
+    if (el) el.textContent = money(total);
+  }
+
+  // ------ CHECKOUT ------
+  async function renderCheckout(){
+    await loadProducts(); // for totals
+    const sum = $("#checkout-summary-body");
+    if (sum){
+      const products = window.__PRODUCTS__||[];
+      const cart = getCart();
+      sum.innerHTML = cart.map(i=>{
+        const p = products.find(x=>x.id===i.id)||{};
+        const price = Number(p.price||0);
+        return `<tr><td>${p.title||i.id}</td><td>${i.qty||1}</td><td>${money(price)}</td><td style="font-weight:700">${money(price*(i.qty||1))}</td></tr>`;
+      }).join("");
+      const tEl = $("#checkout-total");
+      const total = cart.reduce((s,i)=>{
+        const p = products.find(x=>x.id===i.id)||{};
+        return s + Number(p.price||0)*Number(i.qty||1);
+      },0);
+      if (tEl) tEl.textContent = money(total);
     }
-    var cart = loadCart();
-    if(cart.length===0){ main.innerHTML="<h1>Checkout</h1><p>Your cart is empty.</p>"; return; }
 
-    var total = 0, rows="";
-    cart.forEach(function(item){
-      var p = findProduct(item.id); if(!p) return;
-      var sub = p.price * item.qty; total += sub;
-      rows += "<tr><td>"+p.title+"</td><td style='text-align:center'>"+item.qty+"</td><td style='text-align:right'>$"+p.price.toFixed(2)+"</td><td style='text-align:right'>$"+sub.toFixed(2)+"</td></tr>";
-    });
-
-    main.innerHTML =
-      "<h1>Checkout</h1>"
-      + "<div style='display:grid;gap:1rem;grid-template-columns:1fr 1fr;'>"
-      +   "<form id='checkout-form' style='background:#fff;border:1px solid #eee;border-radius:10px;padding:1rem;'>"
-      +     "<h3 style='margin-top:0'>Billing & Shipping</h3>"
-      +     "<label>Name<input required style='width:100%'></label><br/>"
-      +     "<label>Email<input type='email' required style='width:100%'></label><br/>"
-      +     "<label>Phone<input required style='width:100%'></label><br/>"
-      +     "<label>Address<textarea required style='width:100%;height:90px'></textarea></label><br/>"
-      +     "<label>City<input required style='width:100%'></label><br/>"
-      +     "<label>Country<input required style='width:100%'></label><br/>"
-      +     "<h3>Payment</h3>"
-      +     "<p style='opacity:.8'>Tap Payments integration will go here (demo only).</p>"
-      +     "<button type='submit' class='btn'>Place Order (Demo)</button>"
-      +   "</form>"
-      +   "<div style='background:#fff;border:1px solid #eee;border-radius:10px;padding:1rem;'>"
-      +     "<h3 style='margin-top:0'>Order Summary</h3>"
-      +     "<table style='width:100%;border-collapse:collapse'>"
-      +       "<thead><tr><th align='left'>Item</th><th>Qty</th><th align='right'>Price</th><th align='right'>Subtotal</th></tr></thead>"
-      +       "<tbody>"+rows+"</tbody>"
-      +     "</table>"
-      +     "<div style='text-align:right;font-weight:700;margin-top:1rem'>Total: $"+total.toFixed(2)+"</div>"
-      +   "</div>"
-      + "</div>";
-
-    document.getElementById("checkout-form").addEventListener("submit", function(e){
-      e.preventDefault();
-      alert("Demo: order placed.");
-      try{ localStorage.removeItem("cart"); }catch(_){}
-      if (typeof updateHeaderCount==="function") updateHeaderCount();
-      location.href="index.html";
-    });
+    const place = $("#place-order");
+    if (place){
+      place.onclick = ()=>{
+        const products = window.__PRODUCTS__||[];
+        const cart = getCart();
+        const items = cart.map(x=>{
+          const p = products.find(pp=>pp.id===x.id)||{};
+          return { id:x.id, title:p.title||x.id, price:Number(p.price||0), qty:Number(x.qty||1) };
+        });
+        const order = {
+          id: ("ORD-"+Math.random().toString(36).substring(2,7).toUpperCase()),
+          created_at: new Date().toISOString(),
+          items,
+          customer:{
+            name: $("#name")?.value||"",
+            email: $("#email")?.value||"",
+            phone: $("#phone")?.value||""
+          },
+          total: items.reduce((s,i)=>s+i.price*i.qty,0),
+          status: "Placed"
+        };
+        const all = getOrders();
+        all.unshift(order);
+        setOrders(all);
+        setCart([]);
+        location.href = "thankyou.html?id="+encodeURIComponent(order.id);
+      };
+    }
   }
-  window.renderCheckout = renderCheckout;
 
-  document.addEventListener("DOMContentLoaded", function(){
-    var page = (document.body && document.body.dataset && document.body.dataset.page) || "";
-    if (page==="checkout") renderCheckout();
+  // ------ ORDERS (list/detail) already works in your orders.html ------
+  // (we keep that page’s inline JS; nothing needed here)
+
+  // ------ BOOT ------
+  document.addEventListener("DOMContentLoaded", async ()=>{
+    await loadConfig();
+    renderHeader(); renderFooter();
+
+    const page = document.body?.dataset?.page || document.documentElement?.dataset?.page || "";
+
+    if (page==="home") { renderHome(); }
+    if (page==="products") { renderProducts(); }
+    if (page==="cart") { renderCart(); }
+    if (page==="checkout") { renderCheckout(); }
   });
 })();
+// === Active nav & sticky header ===
+(function(){
+  function markActiveNav(){
+    var path = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+    var links = document.querySelectorAll("header a[href$='.html']");
+    links.forEach(function(a){
+      try{
+        var href = (a.getAttribute("href")||"").toLowerCase();
+        if (href.endsWith(path)) a.classList.add("active");
+      }catch(e){}
+    });
+  }
+  function toggleScrolled(){
+    if (window.scrollY > 8) document.body.classList.add("scrolled");
+    else document.body.classList.remove("scrolled");
+  }
+  window.addEventListener("scroll", toggleScrolled, {passive:true});
+  document.addEventListener("DOMContentLoaded", function(){ markActiveNav(); toggleScrolled(); });
+})();
+// === Supplier homepage renderer (banners + materials) ===
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function el(html){ var d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstChild; }
 
+  async function loadConfig(){
+    try{
+      const res = await fetch("store_config.json?nocache="+Date.now());
+      return await res.json();
+    }catch(e){ console.error("config load failed", e); return {}; }
+  }
+
+  function bannerToneClass(tone){
+    return "tone-"+(tone||"blue");
+  }
+
+  function renderBanners(cfg){
+    const host = byId("banners-track"); if(!host) return;
+    const list = (cfg.banners||[]);
+    if(!list.length){ host.innerHTML = '<div class="banner-card tone-blue"><div class="banner-copy"><h3>Welcome</h3><div class="sub">Add banners in store_config.json</div></div></div>'; return; }
+    host.innerHTML = list.map(b => `
+      <article class="banner-card ${bannerToneClass(b.tone)}">
+        <div class="banner-copy">
+          <h3>${b.title||""}</h3>
+          <div class="sub">${b.subtitle||""}</div>
+        </div>
+        <div class="banner-cta">
+          ${b.cta ? `<a class="btn" href="${b.href||'#'}">${b.cta}</a>` : ""}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  function renderMaterials(cfg){
+    const host = byId("materials-grid"); if(!host) return;
+    const list = (cfg.materials||[]);
+    if(!list.length){ host.innerHTML = ""; return; }
+    host.innerHTML = list.map(m => `
+      <a class="material-card" href="${m.href||'#'}">
+        <div class="material-label">${m.label||""}</div>
+        <div class="material-blurb">${m.blurb||""}</div>
+      </a>
+    `).join("");
+  }
+
+  document.addEventListener("DOMContentLoaded", async function(){
+    // Only on home
+    const isHome = /index\.html$/i.test(location.pathname) || /(\/|\\)$/.test(location.pathname);
+    if(!isHome) return;
+    const cfg = await loadConfig();
+    renderBanners(cfg);
+    renderMaterials(cfg);
+  });
+})();
+/* === Active nav highlight (no HTML changes required) === */
+(function setActiveNav(){
+  try{
+    const here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+    document.querySelectorAll(".nav a[href]").forEach(a=>{
+      const target = (a.getAttribute("href")||"").split("?")[0].toLowerCase();
+      if (target && here === target) a.classList.add("active");
+    });
+  }catch(e){}
+})();
+
+/* === Home enhancements driven by store_config.json === */
+(async function enhanceHome(){
+  const isHome = /(?:^|\/)index\.html(?:$|\?)/i.test(location.pathname + location.search);
+  if(!isHome) return;
+  let cfg={};
+  try{ cfg = await (await fetch('store_config.json?nocache='+Date.now())).json(); }catch(e){ console.warn('config load failed', e); }
+
+  // HERO
+  const hero = document.getElementById('hero');
+  if(hero && Array.isArray(cfg.banners) && cfg.banners.length){
+    let idx = 0;
+    function render(){
+      const b = cfg.banners[idx] || {};
+      hero.innerHTML = `
+        <div class="hero-slide">
+          <div class="copy">
+            <h1>${b.title||''}</h1>
+            <p>${b.subtitle||''}</p>
+            <div><a class="hero-cta" href="${b.cta_url||'#'}">${b.cta_text||'Shop'}</a></div>
+          </div>
+          <img src="images/${b.image||''}" alt="">
+          <div class="hero-dots">${(cfg.banners||[]).map((_,i)=>`<span class="${i===idx?'active':''}"></span>`).join('')}</div>
+        </div>`;
+      hero.querySelectorAll('.hero-dots span').forEach((d,i)=>d.addEventListener('click',()=>{idx=i; render();}));
+    }
+    render();
+    setInterval(()=>{ idx=(idx+1)%(cfg.banners.length||1); render(); },7000);
+  }
+
+  // MATERIALS
+  const mat = document.getElementById('materials');
+  if(mat && Array.isArray(cfg.materials)){
+    mat.innerHTML = cfg.materials.map(m=>`
+      <a class="material-card" href="products.html?category=${encodeURIComponent(m.slug||m.name||'')}">
+        <img src="images/${m.icon||'icons/box.svg'}" alt="">
+        <div><div class="name">${m.name||''}</div><div style="color:#64748b;font-size:.9rem">Browse</div></div>
+      </a>
+    `).join('');
+  }
+})();
+
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    var current = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('nav a[href]').forEach(function(a){
+      var href = (a.getAttribute('href') || '').toLowerCase();
+      var target = href.split('/').pop() || href;
+      if (target === current || (current === 'index.html' && (href === '/' || /index\.html$/i.test(href)))) {
+        a.classList.add('is-active');
+      }
+    });
+  } catch (e) { console.error('active nav error', e); }
+});

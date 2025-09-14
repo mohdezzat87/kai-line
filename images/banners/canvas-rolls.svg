@@ -1,0 +1,13 @@
+﻿<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 700'>
+  <defs>
+    <linearGradient id='g2' x1='1' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#f97316'/><stop offset='1' stop-color='#ef4444'/>
+    </linearGradient>
+  </defs>
+  <rect width='1600' height='700' fill='url(#g2)'/>
+  <g font-family='Segoe UI, Roboto, Arial' fill='white'>
+    <text x='120' y='200' font-size='88' font-weight='700'>Artist-Grade Canvas Rolls</text>
+    <text x='120' y='280' font-size='36' opacity='.9'>Smooth & textured • matte & gloss</text>
+    <rect x='1080' y='160' width='340' height='340' rx='24' fill='rgba(255,255,255,.08)'/>
+  </g>
+</svg>

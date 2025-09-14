@@ -1,19 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
-    <link rel="stylesheet" href="static/css/style.css">
-</head>
-<body data-page="cart">
-    <header id="header"></header>
-    <main id="main"></main>
-    <footer id="footer"></footer>
-    <script>
-window.STORE_CONFIG = {"store_name": "Kai Line", "slug": "kai-line", "color": "#e2d4c1", "hero_image": "hero.png", "categories": [{"name": "Women's Fashion", "image": "fashion_category.png"}, {"name": "Women's Accessories", "image": "accessories_category.png"}]};
-window.PRODUCTS_DATA = [{"id": "7537cfe4-32b1-49e9-a543-fc349e52113e", "title": "Flowy Dress", "description": "A beautiful flowy dress perfect for any occasion.", "category": "Women's Fashion", "price": 120.0, "image": "dress_placeholder.png"}, {"id": "e8419e91-8789-4e45-80c0-9902b4cb4cb1", "title": "Statement Earrings", "description": "Elegant gold‑tone earrings to elevate your look.", "category": "Women's Accessories", "price": 40.0, "image": "earrings_placeholder.png"}, {"id": "f5e4847d-c92a-466b-ba4c-566dedc72259", "title": "Casual Tunic", "description": "Soft and comfortable tunic for everyday wear.", "category": "Women's Fashion", "price": 80.0, "image": "dress_placeholder.png"}, {"id": "282271ac-1456-4bc8-8e99-4836eee31ccb", "title": "Delicate Bracelet", "description": "Minimalist bracelet featuring polished metal accents.", "category": "Women's Accessories", "price": 35.0, "image": "earrings_placeholder.png"}];
-</script>
-<script src="static/js/script.js"></script>
-</body>
-</html>
+﻿<!doctype html><html lang="en" data-page="cart"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cart</title><link rel="stylesheet" href="static/css/style.css"><link rel="icon" href="images/favicon.ico">
+<link rel="stylesheet" href="static/css/theme.pix.css">
+  <link rel="stylesheet" href="static/css/style.css" /></head>
+<body data-page="cart"><header id="header"></header>
+<main class="container" style="padding:20px 0">
+  <h1>Your Cart</h1>
+  <table id="cart-table" class="table">
+    <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th><th></th></tr></thead>
+    <tbody id="cart-table-body"></tbody>
+  </table>
+  <div class="total-line" style="margin-top:10px"><div style="color:#64748b">Total</div><div id="cart-total" style="font-weight:700"></div></div>
+  <div style="margin-top:14px"><button id="to-checkout" class="btn">Proceed to Checkout</button></div>
+</main><footer id="footer"></footer>
+<script src="static/js/script.js"></script>  <script src="__pixart_slider.js" defer></script></body></html>
+
+
+
+
+

@@ -1,15 +1,28 @@
-﻿<!DOCTYPE html>
-<html lang="en" data-page="checkout">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout</title>
-  <link rel="stylesheet" href="static/css/style.css">
-</head>
-<body data-page="checkout">
-  <header id="header"></header>
-  <main id="main"></main>
-  <footer id="footer"></footer>
-  <script src="static/js/script.js"></script>
-</body>
-</html>
+﻿<!doctype html><html lang="en" data-page="checkout"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Checkout</title><link rel="stylesheet" href="static/css/style.css"><link rel="icon" href="images/favicon.ico">
+<link rel="stylesheet" href="static/css/theme.pix.css">
+  <link rel="stylesheet" href="static/css/style.css" /></head>
+<body data-page="checkout"><header id="header"></header>
+<main class="container" style="padding:20px 0;display:grid;gap:24px;grid-template-columns:1.1fr .9fr">
+  <section class="card" style="padding:16px">
+    <h2>Billing & Shipping</h2>
+    <div><div>Name</div><input id="name" class="input" /></div>
+    <div><div>Email</div><input id="email" class="input" /></div>
+    <div><div>Phone</div><input id="phone" class="input" /></div>
+    <div style="margin-top:12px"><button id="place-order" class="btn">Place Order (Demo)</button></div>
+  </section>
+  <section class="card" style="padding:16px">
+    <h2>Order Summary</h2>
+    <table class="table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+      <tbody id="checkout-summary-body"></tbody>
+    </table>
+    <div class="total-line" style="margin-top:10px"><div style="color:#64748b">Total</div><div id="checkout-total" style="font-weight:700"></div></div>
+  </section>
+</main><footer id="footer"></footer>
+<script src="static/js/script.js"></script>  <script src="__pixart_slider.js" defer></script></body></html>
+
+
+
+
+

@@ -3,14 +3,66 @@
     "slug":  "kai-line",
     "color":  "#5BA7D1",
     "hero_image":  "hero_pro.jpg",
-    "categories":  [
-                       {
-                           "name":  "Women\u0027s Fashion",
-                           "image":  "fashion_category.png"
-                       },
-                       {
-                           "name":  "Women\u0027s Accessories",
-                           "image":  "accessories_category.png"
-                       }
-                   ]
+    "currency_code":  "QAR",
+    "currency_locale":  "en-QA",
+    "currency":  "QAR",
+    "currency_symbol":  "QAR ",
+    "pay_endpoint":  "https://d1e043e98043.ngrok-free.app/checkout",
+    "payserver_url":  "https://9be6a30c9e86.ngrok-free.app",
+    "banners":  [
+                    {
+                        "id":  "hero-1",
+                        "image":  "images/banners/fabric-rolls.svg",
+                        "title":  "Premium Fabric Banner Rolls",
+                        "subtitle":  "Wrinkle-resistant • vivid color • up to 50m",
+                        "cta_text":  "Shop Fabric",
+                        "cta_url":  "products.html?category=Fabric%20Banners",
+                        "ctaText":  "Shop Fabric",
+                        "ctaHref":  "products.html?cat=fabric",
+                        "accent":  "#6366f1"
+                    },
+                    {
+                        "id":  "hero-2",
+                        "image":  "images/banners/canvas-rolls.svg",
+                        "title":  "Artist-Grade Canvas Rolls",
+                        "subtitle":  "Smooth \u0026 textured • matte \u0026 gloss",
+                        "cta_text":  "Shop Canvas",
+                        "cta_url":  "products.html?category=Canvas",
+                        "ctaText":  "Shop Canvas",
+                        "ctaHref":  "products.html?cat=canvas",
+                        "accent":  "#ef4444"
+                    }
+                ],
+    "materials":  [
+                      {
+                          "icon":  "icons/fabric.svg",
+                          "name":  "Fabric Banner Rolls",
+                          "slug":  "Fabric%20Banners"
+                      },
+                      {
+                          "icon":  "icons/pvc.svg",
+                          "name":  "PVC Banner Rolls",
+                          "slug":  "PVC%20Banners"
+                      },
+                      {
+                          "icon":  "icons/canvas.svg",
+                          "name":  "Canvas Rolls",
+                          "slug":  "Canvas"
+                      },
+                      {
+                          "icon":  "icons/ink.svg",
+                          "name":  "UV \u0026 Eco Solvent Inks",
+                          "slug":  "Inks"
+                      },
+                      {
+                          "icon":  "icons/flagpole.svg",
+                          "name":  "Flag Poles",
+                          "slug":  "Flag%20Poles"
+                      },
+                      {
+                          "icon":  "icons/rollup.svg",
+                          "name":  "Roll-Up Stands",
+                          "slug":  "Roll%20Up%20Stands"
+                      }
+                  ]
 }

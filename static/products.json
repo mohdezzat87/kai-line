@@ -1,0 +1,8 @@
+﻿[
+  { "id":"FAB-ROLL-01","name":"Fabric Banner Roll 440gsm","price":220.00,"image":"images\banners\fabric-rolls.jpg","category":"Fabric Banners" },
+  { "id":"PVC-ROLL-01","name":"PVC Banner Roll 510gsm","price":185.00,"image":"images\banners\fabric-rolls.jpg","category":"PVC Banners" },
+  { "id":"CAN-ROLL-01","name":"Canvas Roll Matte","price":260.00,"image":"images\banners\canvas-rolls.jpg","category":"Canvas" },
+  { "id":"INK-UV-01","name":"UV Ink (1L)","price":150.00,"image":"images\icons\ink.svg","category":"Inks" },
+  { "id":"FLAG-POLE-01","name":"Aluminum Flag Pole 6m","price":390.00,"image":"images\icons\flagpole.svg","category":"Flag Poles" },
+  { "id":"ROL-UP-01","name":"Roll-Up Stand 85x200cm","price":120.00,"image":"images\icons\rollup.svg","category":"Roll Up Stands" }
+]

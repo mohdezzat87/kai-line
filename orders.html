@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html><html lang="en" data-page="orders">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Orders</title>
+  <link rel="stylesheet" href="static/css/style.css">
+<link rel="icon" href="images/favicon.ico">
+<link rel="stylesheet" href="static/css/theme.pix.css">
+  <link rel="stylesheet" href="static/css/style.css" /></head>
+<body data-page="orders">
+  <header id="header"></header>
+
+  <main class="container" style="padding:28px 0;">
+    <div class="hero"><h1>My Orders</h1></div>
+    <div id="orders-list"></div>
+
+    <section id="order-detail" style="display:none">
+      <div class="invoice" id="invoice">
+        <div class="top">
+          <div>
+            <div class="title">Invoice <span class="badge" id="inv-id"></span></div>
+            <div class="meta" id="inv-meta"></div>
+          </div>
+          <img src="images/logo.png" alt="Logo" style="height:44px;object-fit:contain;">
+        </div>
+
+        <table class="table" aria-label="Invoice lines">
+          <thead><tr><th>Item</th><th style="width:120px">Qty</th><th style="width:140px">Price</th><th style="width:160px">Subtotal</th></tr></thead>
+          <tbody id="inv-rows"></tbody>
+        </table>
+
+        <div class="totals">
+          <div><div class="meta">Subtotal</div><div id="inv-sub" style="font-weight:800"></div></div>
+        </div>
+      </div>
+
+      <div class="container" style="max-width:880px;margin:0 auto 28px;display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn" id="btn-dl">Download PDF</button>
+        <a class="btn btn-secondary" href="orders.html">Back to orders</a>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer"></footer>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="static/js/script.js"></script>
+  <script>
+  // Money (QAR)
+  const __CURRENCY__ = (window.__STORE_CONFIG__?.currency_symbol) || "QAR ";
+  const money = v => __CURRENCY__ + Number(v||0).toFixed(2);
+  const loadOrders = () => { try{ return JSON.parse(localStorage.getItem("orders")||"[]") } catch(_){ return [] } };
+
+  function renderOrdersList(){
+    const list = loadOrders();
+    const host = document.getElementById("orders-list");
+    document.getElementById("order-detail").style.display="none";
+    host.style.display = "";
+    if (!list.length){ host.innerHTML = '<p>No orders yet.</p>'; return; }
+
+    host.innerHTML = list.map(o=>{
+      const dt = o.created_at ? new Date(o.created_at) : new Date();
+      const date = isNaN(dt.getTime()) ? "" : dt.toLocaleString();
+      const total = (o.items||[]).reduce((s,i)=> s + Number(i.price||0)*Number(i.qty||0), 0);
+      return `<div class="order-card">
+        <div><div class="order-id">${o.id}</div><div class="order-date">${date}</div></div>
+        <div>${(o.items||[]).length} item(s)</div>
+        <div style="font-weight:800">${money(total)}</div>
+        <div style="text-align:right"><a class="btn btn-ghost" href="orders.html?id=${encodeURIComponent(o.id)}">View</a></div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderOrderDetail(id){
+    const order = loadOrders().find(o=>o.id===id);
+    if (!order) return renderOrdersList();
+    document.getElementById("orders-list").style.display="none";
+    const box = document.getElementById("order-detail");
+    box.style.display="block";
+
+    document.getElementById("inv-id").textContent = order.id;
+    const dt = order.created_at ? new Date(order.created_at) : new Date();
+    const date = isNaN(dt.getTime()) ? "" : dt.toLocaleString();
+    const name = order?.customer?.name || "Customer";
+    document.getElementById("inv-meta").textContent = `${date} • ${name}`;
+
+    const rows = (order.items||[]).map(i => {
+      const title = i.title || i.id || "Item";
+      const qty = Number(i.qty||0);
+      const price = Number(i.price||0);
+      const sub = price*qty;
+      return `<tr>
+        <td>${title}</td><td>${qty}</td><td>${money(price)}</td><td style="font-weight:700">${money(sub)}</td>
+      </tr>`;
+    }).join("");
+    document.getElementById("inv-rows").innerHTML = rows;
+
+    const subTotal = (order.items||[]).reduce((s,i)=> s + Number(i.price||0)*Number(i.qty||0), 0);
+    document.getElementById("inv-sub").textContent = money(subTotal);
+
+    document.getElementById("btn-dl").onclick = () => {
+      html2pdf().set({
+        margin:10, filename:`Invoice-${order.id}.pdf`,
+        image:{type:"jpeg", quality:0.98},
+        html2canvas:{scale:2, useCORS:true},
+        jsPDF:{unit:"mm", format:"a4", orientation:"portrait"}
+      }).from(document.getElementById("invoice")).save();
+    };
+  }
+
+  (function boot(){
+    const url = new URL(location.href);
+    const id = url.searchParams.get("id");
+    if (id) renderOrderDetail(id); else renderOrdersList();
+  })();
+  </script>
+  <script src="__pixart_slider.js" defer></script></body>
+</html>
+
+
+
+
+
