@@ -340,7 +340,7 @@
             <p>${b.subtitle||''}</p>
             <div><a class="hero-cta" href="${b.cta_url||'#'}">${b.cta_text||'Shop'}</a></div>
           </div>
-          <img src="images/${b.image||''}" alt="">
+          <img src="${b.image||''}" alt="">
           <div class="hero-dots">${(cfg.banners||[]).map((_,i)=>`<span class="${i===idx?'active':''}"></span>`).join('')}</div>
         </div>`;
       hero.querySelectorAll('.hero-dots span').forEach((d,i)=>d.addEventListener('click',()=>{idx=i; render();}));
@@ -373,3 +373,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   } catch (e) { console.error('active nav error', e); }
 });
+
+
