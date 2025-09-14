@@ -134,3 +134,12 @@ button{font:inherit}
 @media (prefers-reduced-motion:reduce){
   .slider .slides{scroll-behavior:auto}
 }
+/* === Mobile nav dropdown (hamburger) === */
+@media (max-width: 640px){
+  .topbar .nav.open{
+    display:flex;flex-direction:column;gap:8px;
+    position:absolute;right:16px;top:56px;
+    background:#fff;border:1px solid #e5e7eb;border-radius:12px;
+    padding:10px 12px;box-shadow:0 10px 30px rgba(2,6,23,.12)
+  }
+}

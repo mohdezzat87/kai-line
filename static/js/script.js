@@ -375,3 +375,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// === Mobile hamburger menu toggle ===
+document.addEventListener("DOMContentLoaded", function(){
+  var nav = document.querySelector(".topbar .nav");
+  var toggle = document.createElement("button");
+  toggle.className = "nav-toggle";
+  toggle.innerHTML = "☰";
+  toggle.style.cssText = "margin-left:auto;padding:6px 10px;border:0;background:#2563eb;color:#fff;border-radius:8px;cursor:pointer";
+  if(nav && nav.parentNode){
+    nav.parentNode.insertBefore(toggle, nav);
+    toggle.addEventListener("click", function(){
+      nav.classList.toggle("open");
+    });
+  }
+});
