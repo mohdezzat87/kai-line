@@ -1,4 +1,5 @@
-﻿/* --------- Modern refresh (2025) --------- */
+﻿@import "./pixart.pack.css";
+/* --------- Modern refresh (2025) --------- */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root{
@@ -520,4 +521,4 @@ footer{margin:40px 0 20px;color:#64748b}
 }
 
 @import "./theme.pix.css";
-@import "./pixart.pack.css";
+
