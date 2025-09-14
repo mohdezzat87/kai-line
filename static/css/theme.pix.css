@@ -1,0 +1,90 @@
+﻿:root{
+  --brand:#0ea5e9; --brand-2:#6366f1; --accent:#f97316; --danger:#ef4444;
+  --ink:#0f172a; --muted:#64748b; --bg:#0b1020; --panel:#0f172a;
+  --radius:18px; --shadow:0 10px 30px rgba(2,6,23,.18),0 2px 6px rgba(2,6,23,.08);
+}
+*{box-sizing:border-box} html,body{scroll-behavior:smooth}
+body{color:#0b1220;background:#f7f8fb;font:16px/1.6 'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial}
+.container{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* Top bar */
+header .brand{display:flex;gap:12px;align-items:center}
+header .brand img{height:34px;width:auto}
+nav a{padding:14px 10px;border-radius:10px;color:#334155;font-weight:600}
+nav a:hover{color:var(--brand)}
+
+/* Pixart-like hero band */
+.hero{
+  position:relative; isolation:isolate; overflow:hidden; border-radius:24px;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  color:white; padding:56px 44px; margin:18px 0 28px; box-shadow:var(--shadow);
+}
+.hero:before{
+  content:""; position:absolute; inset:-30%; background:
+  radial-gradient(600px 300px at 10% 20%,rgba(255,255,255,.12),transparent 60%),
+  radial-gradient(600px 300px at 90% 80%,rgba(255,255,255,.08),transparent 60%);
+  filter:saturate(1.1); z-index:-1; animation:floatBg 16s linear infinite;
+}
+@keyframes floatBg{from{transform:translateX(0)}to{transform:translateX(-3%)}}
+.hero h1{font-size:44px;line-height:1.12;margin:0 0 10px}
+.hero p.lead{font-size:18px;opacity:.95;margin:0 0 22px}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;
+  font-weight:700;text-decoration:none;border:2px solid transparent;transition:.2s all ease;
+}
+.btn-primary{background:#fff;color:#0b1220}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-outline{background:transparent;border-color:rgba(255,255,255,.6);color:white}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.12)}
+
+/* Feature pills row */
+.pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0 8px}
+.pill{
+  background:#fff;border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);min-height:78px;
+}
+.pill h4{margin:0;font-size:18px}
+.pill small{color:#64748b}
+
+/* Product categories (Pixart style chips + tiles) */
+.section{margin:32px 0}
+.section h2{font-size:26px;margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px}
+.chip{
+  padding:8px 12px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:600;border:1px solid #dbeafe
+}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{
+  border-radius:20px;background:#fff;padding:18px 18px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:center
+}
+.card .icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#dbeafe,#e0e7ff)}
+.card h3{font-size:18px;margin:0 0 2px}
+.card p{margin:0;color:#64748b}
+
+/* Dark band slider (uses store_config.json banners) */
+.slider{position:relative;border-radius:22px;background:#0b1020;color:white;overflow:hidden;margin:28px 0}
+.slide{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;align-items:center;min-height:320px;padding:36px}
+.slide h3{font-size:34px;margin:0 0 6px}
+.slide p{opacity:.9;margin:0 0 16px}
+.slide .cta .btn-primary{background:linear-gradient(135deg,#fff,#f8fafc)}
+.slide img{width:100%;height:100%;object-fit:cover;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.slider .dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px}
+.slider .dots button{width:10px;height:10px;border-radius:99px;border:0;background:rgba(255,255,255,.45)}
+.slider .dots button.is-active{background:#fff;width:26px}
+
+/* Cart/order panels */
+.panel{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.table{width:100%;border-collapse:separate;border-spacing:0 10px}
+.table th{text-align:left;color:#475569;font-size:13px}
+.table td{background:#fff;padding:12px;border-top-left-radius:10px;border-bottom-left-radius:10px}
+.table tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
+
+/* Footer */
+footer{margin:40px 0 20px;color:#64748b}
+@media (max-width:900px){
+  .pills{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .slide{grid-template-columns:1fr}
+  .hero{padding:34px 22px}
+  .hero h1{font-size:32px}
+}
